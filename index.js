@@ -7,7 +7,7 @@ const StoryFabricator = {
 					reject(error);
 				}
 				let text = body.split('<div class="story">')[1].split('</div>')[0];
-				fulfill(text);
+				fulfill(text.trim());
 			});
 		});
 	}
