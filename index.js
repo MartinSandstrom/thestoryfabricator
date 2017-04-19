@@ -1,15 +1,27 @@
-var request = require("request");
+var http = require("http");
 const StoryFabricator = {
-	getRandomStory() {
-		return new Promise((fulfill, reject) => {
-			request({uri: "http://storyfabricator.herokuapp.com/"}, (error, response, body) => {
-				if(error) {
-					reject(error);
-				}
-				let text = body.split('<div class="story">')[1].split('</div>')[0];
-				fulfill(text.trim());
-			});
-		});
-	}
+    getRandomStory() {
+        return new Promise((fulfill, reject) => {
+            http.get('http://storyfabricator.herokuapp.com/story.json', (res) => {
+                const {statusCode} = res;
+                if (statusCode !== 200) {
+                    reject('Request Failed');
+                }
+                res.setEncoding('utf8');
+                let rawData = '';
+                res.on('data', (chunk) => {
+                    rawData += chunk;
+                });
+                res.on('end', () => {
+                    try {
+                        const parsedData = JSON.parse(rawData);
+                        fulfill(parsedData);
+                    } catch (e) {
+                        console.error(e.message);
+                    }
+                });
+            });
+        });
+    }
 };
 module.exports = StoryFabricator;
